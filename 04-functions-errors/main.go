@@ -16,8 +16,15 @@ func divide(a, b float64) (float64, error) {
 	return a / b, nil
 }
 
+func add(c, d int) int {
+	return c + d
+}
+
 func main() {
 	fmt.Println(greet("Alice"))
+
+	addResult := add(3, 4)
+	fmt.Println("addResult:", addResult)
 
 	result, err := divide(10, 3)
 	if err != nil {
@@ -33,4 +40,5 @@ func main() {
 	}
 
 	fmt.Println("result:", result)
+
 }

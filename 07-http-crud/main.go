@@ -9,14 +9,16 @@ import (
 )
 
 type User struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Age  int    `json:"age"`
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Age   int    `json:"age"`
+	Email string `json:"email"`
 }
 
 type userRequest struct {
-	Name string `json:"name"`
-	Age  int    `json:"age"`
+	Name  string `json:"name"`
+	Age   int    `json:"age"`
+	Email string `json:"email"`
 }
 
 var users = []User{}
@@ -35,7 +37,7 @@ func main() {
 func usersHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		getUsers(w)
+		getUsers(w, r)
 	case http.MethodPost:
 		createUser(w, r)
 	default:
@@ -62,8 +64,30 @@ func userByIDHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getUsers(w http.ResponseWriter) {
-	writeJSON(w, http.StatusOK, users)
+func getUsers(w http.ResponseWriter, r *http.Request) {
+	ageText := r.URL.Query().Get("age")
+
+	// age가 없는 경우 전체 조회
+	if ageText == "" {
+		writeJSON(w, http.StatusOK, users)
+		return
+	}
+
+	age, err := strconv.Atoi(ageText)
+	if err != nil || age < 0 {
+		writeError(w, http.StatusBadRequest, "invalid age")
+		return
+	}
+
+	filteredUsers := []User{}
+
+	for _, user := range users {
+		if user.Age >= age {
+			filteredUsers = append(filteredUsers, user)
+		}
+	}
+
+	writeJSON(w, http.StatusOK, filteredUsers)
 }
 
 func getUser(w http.ResponseWriter, id int) {
@@ -84,9 +108,10 @@ func createUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := User{
-		ID:   nextID,
-		Name: req.Name,
-		Age:  req.Age,
+		ID:    nextID,
+		Name:  req.Name,
+		Age:   req.Age,
+		Email: req.Email,
 	}
 	nextID++
 	users = append(users, user)
@@ -104,6 +129,7 @@ func updateUser(w http.ResponseWriter, r *http.Request, id int) {
 		if users[i].ID == id {
 			users[i].Name = req.Name
 			users[i].Age = req.Age
+			users[i].Email = req.Email
 			writeJSON(w, http.StatusOK, users[i])
 			return
 		}

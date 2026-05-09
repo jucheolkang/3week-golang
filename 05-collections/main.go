@@ -3,12 +3,13 @@ package main
 import "fmt"
 
 func main() {
-	numbers := [3]int{10, 20, 30}
+	numbers := [4]int{10, 20, 30, 40}
 	fmt.Println("array:", numbers)
 	fmt.Println("first number:", numbers[0])
 
 	names := []string{"Alice", "Bob", "Carol"}
 	names = append(names, "Dave")
+	names = append(names, "jucheol")
 
 	fmt.Println("slice:", names)
 	fmt.Println("slice length:", len(names))
@@ -18,6 +19,7 @@ func main() {
 		"Bob":   75,
 	}
 	scores["Carol"] = 88
+	scores["jucheol"] = 80
 
 	aliceScore, ok := scores["Alice"]
 	if ok {
